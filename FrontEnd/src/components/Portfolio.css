@@ -1,0 +1,30 @@
+.portfolio-section {
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.portfolio-title {
+  font-size: 2.5rem;
+  margin-bottom: 50px;
+  font-family: 'Playfair Display', serif;
+}
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .portfolio-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+  }
+}

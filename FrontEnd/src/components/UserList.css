@@ -1,0 +1,564 @@
+.user-list-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Search Bar */
+.search-bar {
+  margin-bottom: 2rem;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.search-bar input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Filters Section */
+.filters-section {
+  display: grid;
+  grid-template-columns: 220px 1fr 220px 220px; /* Type | Skills | Availability | Location */
+  gap: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  background: #ffffff; /* keep white to blend with card style */
+  border-radius: 12px;
+  border: 1px solid #eef0f2;
+  align-items: start;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-group h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.filter-group select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+}
+
+.skills-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem 0.75rem;
+  align-items: start;
+  padding-top: 0.25rem;
+}
+
+/* Skills dropdown (replaces inline grid) */
+.skills-dropdown-group {
+  position: relative;
+}
+
+.skills-dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 220px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.skills-dropdown-toggle .caret {
+  margin-left: 8px;
+  opacity: 0.7;
+}
+
+.skills-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 60;
+  width: 360px;
+  max-height: 260px;
+  overflow: auto;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #e6eefc;
+  box-shadow: 0 10px 30px rgba(15,23,42,0.06);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.skills-dropdown-panel .skill-checkbox {
+  margin: 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+@media (max-width: 900px) {
+  .skills-dropdown-panel { width: 100%; grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .skills-dropdown-panel { grid-template-columns: 1fr; max-height: 220px; }
+}
+
+.skill-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: background 0.12s, border-color 0.12s, transform 0.08s;
+  background: #fafbfd;
+}
+
+.skill-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+.skill-checkbox:hover {
+  transform: translateY(-1px);
+  border-color: #e6eefc;
+  background: #f4f8ff;
+}
+
+.skill-checkbox.checked {
+  background: #eef6ff;
+  border-color: #cfe3ff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .filters-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .filters-section {
+    grid-template-columns: 1fr;
+  }
+  .skill-checkbox {
+    min-width: 0;
+  }
+}
+
+/* Results Count */
+.results-count {
+  margin-bottom: 1rem;
+  color: #666;
+}
+
+/* User Grid */
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.user-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.user-card:hover {
+  transform: translateY(-5px);
+}
+
+.user-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.user-card-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.25rem;
+}
+
+.user-type {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  background: #e9ecef;
+  color: #495057;
+}
+
+.model-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.model-thumb {
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.model-thumb img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+.model-photo-slideshow {
+  /* stretch slideshow horizontally to card edges but do not overlap the header */
+  margin: 0 -1.5rem 1rem -1.5rem;
+}
+
+.book-btn {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.book-btn:hover { background: #ff4b4b; }
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.brand-desc {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.skills-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.skill-tag {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  background: #e7f5ff;
+  color: #1971c2;
+}
+
+.error {
+  color: #dc3545;
+  text-align: center;
+  font-weight: bold;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Model card (compact) */
+.model-card {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: white;
+  transition: box-shadow 0.2s, transform 0.2s;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.model-card:hover { 
+  transform: translateY(-6px); 
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12); 
+}
+
+.model-thumb { 
+  border-radius: 0; 
+  overflow: hidden; 
+  height: 220px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  background: linear-gradient(135deg, #f5f5f5 0%, #e9e9e9 100%);
+  flex-shrink: 0;
+}
+.model-thumb img { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+  display: block; 
+}
+
+/* Card inner text (name) */
+.model-card > div:last-child {
+  padding: 14px 16px;
+  text-align: center;
+  background: white;
+  border-top: 1px solid #f0f0f0;
+}
+.model-card > div:last-child strong {
+  font-size: 1rem;
+  color: #222;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* Model detail modal */
+.model-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 24px;
+  overflow: hidden;
+}
+.model-detail-modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 32px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  position: relative;
+}
+.model-detail-modal h2 {
+  margin: 0 0 24px 0;
+  font-size: 1.8rem;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+.detail-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  border: none;
+  background: transparent;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #666;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+}
+.detail-close:hover {
+  background: #f0f0f0;
+  color: #222;
+}
+
+/* Detail modal content layout */
+.model-detail-modal > div {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Slideshow container */
+.model-detail-modal > div > div:first-child {
+  flex: 1 1 420px;
+  min-width: 320px;
+  width: 100%;
+  max-width: 600px;
+  height: 500px;
+}
+
+/* Details section */
+.model-detail-modal > div > div:last-child {
+  flex: 1 1 320px;
+  min-width: 280px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 16px;
+  width: 100%;
+  text-align: left;
+  align-content: start;
+}
+
+/* Detail paragraphs */
+.model-detail-modal p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.6;
+}
+.model-detail-modal strong {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+/* Skills section in details */
+.model-detail-modal > div > div:last-child > div {
+  grid-column: 1 / -1;
+}
+
+.model-detail-modal > div > div:last-child > div strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+/* Book button styling */
+.model-detail-modal .book-btn {
+  margin-top: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  width: 100%;
+  text-align: center;
+}
+
+/* Brand Card */
+.brand-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+  cursor: pointer;
+  min-height: 160px;
+}
+
+.brand-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  background-color: #f9f9f9;
+}
+
+.brand-card:active {
+  transform: translateY(-3px);
+}
+
+.brand-card-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.brand-name {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  word-break: break-word;
+}
+
+.brand-contact {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #666;
+  word-break: break-word;
+}
+
+.brand-card-footer {
+  font-size: 0.8rem;
+  color: #999;
+  text-align: center;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Brand Detail Modal */
+.brand-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.brand-detail-modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 32px;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.brand-detail-modal h2 {
+  margin: 0 0 24px 0;
+  font-size: 1.8rem;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.brand-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.brand-details p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.6;
+}
+
+.brand-details strong {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.brand-details > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

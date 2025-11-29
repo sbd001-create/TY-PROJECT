@@ -1,0 +1,106 @@
+.portfolio-card {
+  text-align: center;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: visible;
+  padding: 12px 8px; /* compact card padding */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-image-container {
+  width: 170px; /* slightly larger circular avatar */
+  height: 170px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%; /* make the image container round */
+  margin: 0 auto 14px; /* center and add spacing below image */
+  flex: 0 0 auto;
+}
+
+.card-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  border-radius: 50%;
+}
+
+.portfolio-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+/* Overlay that shows the name on hover */
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.35);
+  opacity: 0;
+  transition: opacity 220ms ease;
+  border-radius: 50%;
+}
+
+.portfolio-card:hover .card-overlay,
+.card-image-container.overlay-visible .card-overlay {
+  opacity: 1;
+}
+
+.card-image-container:focus {
+  outline: 2px solid rgba(0,0,0,0.12);
+  outline-offset: 4px;
+}
+
+.overlay-name {
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  padding: 8px 14px;
+  background: rgba(0,0,0,0.45);
+  border-radius: 6px;
+}
+
+.card-content {
+  padding: 6px 0 0;
+}
+.card-content h3 {
+  font-size: 1.1rem;
+  margin: 8px 0 0;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+}
+
+.card-category {
+  font-size: 0.9rem;
+  color: #777;
+  margin: 6px 0 8px;
+}
+
+.view-profile-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.95rem;
+  color: #555;
+  margin-top: 10px;
+  transition: color 0.3s;
+}
+
+.view-profile-link:hover {
+  color: #000;
+}
+
+.arrow {
+  margin-left: 5px;
+  transition: transform 0.3s;
+}
+
+.view-profile-link:hover .arrow {
+  transform: translateX(5px);
+}

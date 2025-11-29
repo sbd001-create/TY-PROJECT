@@ -1,0 +1,33 @@
+.booking-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+.booking-modal{
+  background: #fff;
+  padding: 1.25rem;
+  border-radius: 8px;
+  width: 420px;
+  max-width: calc(100% - 32px);
+  position: relative;
+}
+.booking-close{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.booking-modal h2{ margin-top: 0; }
+.booking-form{ display:flex; flex-direction: column; gap: 0.5rem; }
+.booking-form label{ display:flex; flex-direction: column; gap: 0.25rem; font-size: 0.9rem; }
+.booking-form input, .booking-form textarea{ padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; }
+.booking-actions{ display:flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }
+.booking-cancel{ background:#eee; border:none; padding:0.5rem 0.75rem; border-radius:6px; cursor:pointer; }
+.booking-submit{ background:#007bff; color:white; border:none; padding:0.5rem 0.75rem; border-radius:6px; cursor:pointer; }
