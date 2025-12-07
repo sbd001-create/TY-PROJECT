@@ -10,6 +10,7 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
   const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [certPreview, setCertPreview] = useState(initialData?.modelCertificates || []);
+  const [certFiles, setCertFiles] = useState([]); // newly uploaded certificate files with previews
 
   // Prefill photos and certificate when editing
   useEffect(() => {
@@ -34,6 +35,21 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
       }
     }
   }, [initialData]);
+
+  // Cleanup created object URLs for certFiles when component unmounts
+  useEffect(() => {
+    return () => {
+      try {
+        (certFiles || []).forEach(cf => {
+          if (cf && cf.preview && typeof cf.preview === 'string' && cf.preview.startsWith('blob:')) {
+            URL.revokeObjectURL(cf.preview);
+          }
+        });
+      } catch (err) {
+        // ignore
+      }
+    };
+  }, [certFiles]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,11 +92,11 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
       }));
 
       // Certificate: if a new file is selected, convert it; otherwise keep existing certificate when editing
-      // Handle multiple certificate files
-      const certificateFiles = form.modelCertificate && form.modelCertificate.files ? Array.from(form.modelCertificate.files) : [];
+      // Handle multiple certificate files (use certFiles state for new uploads)
+      const newCertificateFiles = certFiles.map(cf => cf.file || null).filter(Boolean);
       let modelCertificates = [];
       // Convert newly uploaded files to base64
-      for (const f of certificateFiles) {
+      for (const f of newCertificateFiles) {
         const b = await toBase64(f);
         if (b) modelCertificates.push(b);
       }
@@ -364,9 +380,30 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
       </div>
 
       <div className="form-group">
-        <label htmlFor="modelCertificate">Upload Certificates (minimum 4 required for models)</label>
+        <label htmlFor="modelCertificate">Upload Certificates</label>
         <input type="file" id="modelCertificate" name="modelCertificate" accept="application/pdf,image/*" multiple { ...(isEditMode ? {} : { required: true }) } />
-        <p style={{ fontSize: '0.9rem', color: '#666', marginTop: 6 }}>You can upload multiple files. At signup you must upload at least 4 certificates.</p>
+        <p style={{ fontSize: '0.9rem', color: '#666', marginTop: 6 }}>upload at least 4 certificates.</p>
+        <input
+          type="file"
+          id="modelCertificate"
+          name="modelCertificate"
+          accept="application/pdf,image/*"
+          multiple
+          style={{ display: 'none' }}
+        />
+        {/* Visible input handler below: we'll handle files with onChange on a separate hidden input to create previews */}
+        <input
+          type="file"
+          accept="application/pdf,image/*"
+          multiple
+          onChange={(e) => {
+            const files = Array.from(e.target.files || []);
+            const newCerts = files.map(file => ({ file, preview: URL.createObjectURL(file) }));
+            setCertFiles(prev => [...prev, ...newCerts]);
+            // clear the input so same file can be re-selected if needed
+            e.target.value = '';
+          }}
+        />
       </div>
 
       {/* Certificate previews (for both new uploads and existing ones) */}
@@ -392,8 +429,27 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
             </div>
           ))}
 
-          {/* New uploaded files previews (we'll reuse the same conversion used for photos) */}
-          {/* Note: new certificate files are not stored in state as previews; they show via the file input when added on submit */}
+          {/* New uploaded files previews (stored in certFiles state) */}
+          {certFiles && certFiles.length > 0 && certFiles.map((cf, idx) => (
+            <div key={`new-cert-${idx}`} style={{ width: 140, border: '1px solid #eee', padding: 6, borderRadius: 6 }}>
+              {cf.preview ? (
+                <img src={cf.preview} alt={`new-cert-${idx}`} style={{ width: '100%', height: 80, objectFit: 'cover', borderRadius: 4 }} />
+              ) : (
+                <div style={{ fontSize: 12, wordBreak: 'break-all' }}>
+                  {cf.file && cf.file.name}
+                </div>
+              )}
+              <div style={{ marginTop: 6, display: 'flex', justifyContent: 'space-between', gap: 6 }}>
+                <button type="button" className="btn-ghost" onClick={() => {
+                  // revoke object URL and remove
+                  if (cf.preview && cf.preview.startsWith('blob:')) {
+                    URL.revokeObjectURL(cf.preview);
+                  }
+                  setCertFiles(prev => prev.filter((_, i) => i !== idx));
+                }}>Remove</button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
