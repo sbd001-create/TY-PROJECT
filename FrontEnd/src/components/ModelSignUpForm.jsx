@@ -9,7 +9,7 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
   const [photos, setPhotos] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [certPreview, setCertPreview] = useState(initialData?.modelCertificate || null);
+  const [certPreview, setCertPreview] = useState(initialData?.modelCertificates || []);
 
   // Prefill photos and certificate when editing
   useEffect(() => {
@@ -21,7 +21,14 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
           preview: (p && (p.url || p)) ? (p.url || p) : null,
         }));
         setPhotos(initPhotos);
-        setCertPreview(initialData.modelCertificate || null);
+        // initialData may contain either `modelCertificate` (string) or `modelCertificates` (array)
+        if (Array.isArray(initialData.modelCertificates)) {
+          setCertPreview(initialData.modelCertificates || []);
+        } else if (initialData.modelCertificate) {
+          setCertPreview([initialData.modelCertificate]);
+        } else {
+          setCertPreview([]);
+        }
       } catch (err) {
         // ignore errors while initializing previews
       }
@@ -69,12 +76,30 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
       }));
 
       // Certificate: if a new file is selected, convert it; otherwise keep existing certificate when editing
-      const modelCertificateFile = form.modelCertificate && form.modelCertificate.files && form.modelCertificate.files[0];
-      let modelCertificate = '';
-      if (modelCertificateFile) {
-        modelCertificate = await toBase64(modelCertificateFile);
-      } else if (isEditMode && initialData?.modelCertificate) {
-        modelCertificate = initialData.modelCertificate;
+      // Handle multiple certificate files
+      const certificateFiles = form.modelCertificate && form.modelCertificate.files ? Array.from(form.modelCertificate.files) : [];
+      let modelCertificates = [];
+      // Convert newly uploaded files to base64
+      for (const f of certificateFiles) {
+        const b = await toBase64(f);
+        if (b) modelCertificates.push(b);
+      }
+      // Keep existing certificates when editing
+      if (isEditMode) {
+        const existing = Array.isArray(initialData?.modelCertificates)
+          ? initialData.modelCertificates
+          : (initialData?.modelCertificate ? [initialData.modelCertificate] : []);
+        // Append existing ones that were not removed by the user (we manage remove via certPreview state)
+        // Only include existing certificates that still appear in certPreview
+        const keptExisting = existing.filter(e => certPreview.includes(e));
+        modelCertificates = [...keptExisting, ...modelCertificates];
+      }
+
+      // Enforce minimum 4 certificates for signup (not in edit mode)
+      if (!isEditMode && modelCertificates.length < 4) {
+        setErrorMessage('Please upload at least 4 certificates for model signup');
+        setUploading(false);
+        return;
       }
 
       const data = {
@@ -86,7 +111,7 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
         contact: form.modelContact.value.trim(),
         modelPortfolio: form.modelPortfolio.value.trim(),
         modelPhotos,
-        modelCertificate,
+        modelCertificates,
         skills: form.skills.value.split(',').map(skill => skill.trim()).filter(s => s),
         experience: form.experience.value.trim(),
         availability: form.availability.value,
@@ -339,25 +364,38 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
       </div>
 
       <div className="form-group">
-        <label htmlFor="modelCertificate">Upload Certificate</label>
-        <input type="file" id="modelCertificate" name="modelCertificate" accept="application/pdf,image/*" { ...(isEditMode ? {} : { required: true }) } />
+        <label htmlFor="modelCertificate">Upload Certificates (minimum 4 required for models)</label>
+        <input type="file" id="modelCertificate" name="modelCertificate" accept="application/pdf,image/*" multiple { ...(isEditMode ? {} : { required: true }) } />
+        <p style={{ fontSize: '0.9rem', color: '#666', marginTop: 6 }}>You can upload multiple files. At signup you must upload at least 4 certificates.</p>
       </div>
 
-      {isEditMode && certPreview && (
-        <div style={{ marginTop: 8 }}>
-          <strong>Existing Certificate:</strong>
-          <div style={{ marginTop: 6 }}>
-            {certPreview.startsWith('data:') || /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(certPreview) ? (
-              <img src={certPreview} alt="certificate" style={{ maxWidth: 220, display: 'block', borderRadius: 6, border: '1px solid #eee' }} />
-            ) : (
-              <a href={certPreview} target="_blank" rel="noreferrer">View certificate</a>
-            )}
-            <div style={{ marginTop: 6 }}>
-              <button type="button" className="btn-ghost" onClick={() => setCertPreview(null)}>Remove existing certificate</button>
+      {/* Certificate previews (for both new uploads and existing ones) */}
+      <div style={{ marginTop: 8 }}>
+        <strong>Certificates:</strong>
+        <div style={{ marginTop: 8, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {/* Show existing previews from certPreview state (array) */}
+          {certPreview && Array.isArray(certPreview) && certPreview.map((c, idx) => (
+            <div key={`existing-cert-${idx}`} style={{ width: 140, border: '1px solid #eee', padding: 6, borderRadius: 6 }}>
+              {typeof c === 'string' && (c.startsWith('data:') || /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(c)) ? (
+                <img src={c} alt={`cert-${idx}`} style={{ width: '100%', height: 80, objectFit: 'cover', borderRadius: 4 }} />
+              ) : (
+                <div style={{ fontSize: 12, wordBreak: 'break-all' }}>
+                  <a href={c} target="_blank" rel="noreferrer">Open file</a>
+                </div>
+              )}
+              <div style={{ marginTop: 6, display: 'flex', justifyContent: 'space-between', gap: 6 }}>
+                <button type="button" className="btn-ghost" onClick={() => {
+                  // remove this existing preview from certPreview
+                  setCertPreview(prev => prev.filter((_, i) => i !== idx));
+                }}>Remove</button>
+              </div>
             </div>
-          </div>
+          ))}
+
+          {/* New uploaded files previews (we'll reuse the same conversion used for photos) */}
+          {/* Note: new certificate files are not stored in state as previews; they show via the file input when added on submit */}
         </div>
-      )}
+      </div>
 
       {/* Signup Button only enabled when passwords match */}
       <button type="submit" className="signup-btn" disabled={!isMatch || uploading}    

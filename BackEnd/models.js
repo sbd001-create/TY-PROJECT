@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema({
   brandDesc: String,
   modelPortfolio: String,
   modelPhotos: [{ url: String, caption: String, dateAdded: { type: Date, default: Date.now } }],
-  modelCertificate: String,
+  // Support multiple certificates per model (stored as base64 strings or URLs)
+  modelCertificates: [{ type: String }],
   skills: [String],
   experience: String,
   availability: { type: String, enum: ['full-time', 'part-time', 'freelance'], default: 'full-time' },

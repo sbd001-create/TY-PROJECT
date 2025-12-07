@@ -171,13 +171,21 @@ const UserList = () => {
               modelImages = [user.modelPhoto];
             }
 
-            // Determine certificate image if it's an image
-            const cert = user.modelCertificate;
+            // Determine certificate image(s) if available. Support both legacy `modelCertificate` (string)
+            // and new `modelCertificates` (array of strings).
+            const certs = Array.isArray(user.modelCertificates)
+              ? user.modelCertificates
+              : (user.modelCertificate ? [user.modelCertificate] : []);
             let certImage = null;
-            if (cert && typeof cert === 'string') {
-              const isDataImage = cert.startsWith('data:image');
-              const isFileImage = /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(cert);
-              if (isDataImage || isFileImage) certImage = cert;
+            if (certs && certs.length > 0) {
+              // prefer first certificate that looks like an image
+              for (const c of certs) {
+                if (!c || typeof c !== 'string') continue;
+                const isDataImage = c.startsWith('data:image');
+                const isFileImage = /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(c);
+                if (isDataImage || isFileImage) { certImage = c; break; }
+              }
+              // if none look like images, leave certImage null (we'll provide link elsewhere)
             }
 
             const slides = [];
