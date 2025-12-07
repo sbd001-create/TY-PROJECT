@@ -54,9 +54,24 @@ app.post('/api/signup', async (req, res) => {
       };
     }
 
-    // Ensure models include gender explicitly (safe-guard in case frontend omitted it)
+    // For models, explicitly include all model-specific fields (including modelCertificates)
     if (req.body.type === 'model') {
-      userData = { ...userData, gender: req.body.gender || null };
+      userData = {
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password,
+        type: 'model',
+        contact: req.body.contact,
+        gender: req.body.gender || null,
+        modelPortfolio: req.body.modelPortfolio,
+        modelPhotos: req.body.modelPhotos || [],
+        modelCertificates: req.body.modelCertificates || [],
+        skills: req.body.skills || [],
+        experience: req.body.experience,
+        availability: req.body.availability,
+        location: req.body.location,
+        pricePerDay: req.body.pricePerDay || 0,
+      };
     }
 
     const user = new User(userData);
