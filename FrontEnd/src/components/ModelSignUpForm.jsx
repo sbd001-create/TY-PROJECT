@@ -381,19 +381,9 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
 
       <div className="form-group">
         <label htmlFor="modelCertificate">Upload Certificates</label>
-        <input type="file" id="modelCertificate" name="modelCertificate" accept="application/pdf,image/*" multiple { ...(isEditMode ? {} : { required: true }) } />
-        <p style={{ fontSize: '0.9rem', color: '#666', marginTop: 6 }}>upload at least 4 certificates.</p>
         <input
           type="file"
           id="modelCertificate"
-          name="modelCertificate"
-          accept="application/pdf,image/*"
-          multiple
-          style={{ display: 'none' }}
-        />
-        {/* Visible input handler below: we'll handle files with onChange on a separate hidden input to create previews */}
-        <input
-          type="file"
           accept="application/pdf,image/*"
           multiple
           onChange={(e) => {
@@ -403,7 +393,9 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
             // clear the input so same file can be re-selected if needed
             e.target.value = '';
           }}
+          {...(isEditMode ? {} : { required: true })}
         />
+        <p style={{ fontSize: '0.9rem', color: '#666', marginTop: 6 }}>upload at least 4 certificates.</p>
       </div>
 
       {/* Certificate previews (for both new uploads and existing ones) */}
