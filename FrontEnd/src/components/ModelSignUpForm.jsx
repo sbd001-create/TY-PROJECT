@@ -11,6 +11,23 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
   const [errorMessage, setErrorMessage] = useState('');
   const [certPreview, setCertPreview] = useState(initialData?.modelCertificate || null);
 
+  // Prefill photos and certificate when editing
+  useEffect(() => {
+    if (initialData) {
+      try {
+        const initPhotos = (initialData.modelPhotos || []).map(p => ({
+          file: null,
+          caption: (p && p.caption) ? p.caption : '',
+          preview: (p && (p.url || p)) ? (p.url || p) : null,
+        }));
+        setPhotos(initPhotos);
+        setCertPreview(initialData.modelCertificate || null);
+      } catch (err) {
+        // ignore errors while initializing previews
+      }
+    }
+  }, [initialData]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
@@ -35,23 +52,6 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
-
-      // Prefill photos and certificate when editing
-      useEffect(() => {
-        if (initialData) {
-          try {
-            const initPhotos = (initialData.modelPhotos || []).map(p => ({
-              file: null,
-              caption: (p && p.caption) ? p.caption : '',
-              preview: (p && (p.url || p)) ? (p.url || p) : null,
-            }));
-            setPhotos(initPhotos);
-            setCertPreview(initialData.modelCertificate || null);
-          } catch (err) {
-            // ignore
-          }
-        }
-      }, [initialData]);
 
     try {
       // Convert photos to base64 where new files were added; keep existing previews otherwise
