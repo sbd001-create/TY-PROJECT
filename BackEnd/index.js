@@ -246,6 +246,12 @@ app.post('/api/bookings', async (req, res) => {
       return res.status(404).json({ success: false, error: 'Model not found' });
     }
 
+    // Validate that the brand name matches an existing brand in the database
+    const brand = await User.findOne({ username: brandName, type: 'brand', isDeleted: { $ne: true } });
+    if (!brand) {
+      return res.status(400).json({ success: false, error: `Brand '${brandName}' not found in the database. Please use a valid brand name.` });
+    }
+
     // Compute total price server-side (use model's pricePerDay)
     const perDay = typeof modelUser.pricePerDay === 'number' ? modelUser.pricePerDay : 0;
     const totalPrice = perDay * Number(days);

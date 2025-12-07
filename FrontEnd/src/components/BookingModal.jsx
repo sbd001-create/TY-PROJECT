@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import './BookingModal.css';
 
 const BookingModal = ({ model, onClose, onSubmit }) => {
@@ -9,6 +9,8 @@ const BookingModal = ({ model, onClose, onSubmit }) => {
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [brands, setBrands] = useState([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
 
   const perDay = model?.pricePerDay || 0;
 
@@ -16,6 +18,34 @@ const BookingModal = ({ model, onClose, onSubmit }) => {
     const d = Number(days) || 0;
     return (Number(perDay) * d).toFixed(2);
   }, [perDay, days]);
+
+  // Fetch available brands on modal mount
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/users?type=brand');
+        const data = await res.json();
+        if (data.success && data.users) {
+          setBrands(data.users);
+        }
+      } catch (err) {
+        console.error('Error fetching brands:', err);
+      } finally {
+        setBrandsLoading(false);
+      }
+    };
+    fetchBrands();
+  }, []);
+
+  const handleBrandChange = (e) => {
+    const selectedBrandName = e.target.value;
+    setName(selectedBrandName);
+    // Optionally set email from the selected brand's email
+    const selectedBrand = brands.find(b => b.username === selectedBrandName);
+    if (selectedBrand) {
+      setEmail(selectedBrand.email || '');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,12 +103,24 @@ const BookingModal = ({ model, onClose, onSubmit }) => {
         <form onSubmit={handleSubmit} className="booking-form">
           <label>
             Brand name
-            <input type="text" value={name} onChange={e => setName(e.target.value)} required />
+            <select value={name} onChange={handleBrandChange} required disabled={brandsLoading}>
+              <option value="">
+                {brandsLoading ? 'Loading brands...' : 'Select a brand'}
+              </option>
+              {brands.map(brand => (
+                <option key={brand._id} value={brand.username}>
+                  {brand.username}
+                </option>
+              ))}
+            </select>
+            {brands.length === 0 && !brandsLoading && (
+              <p style={{ fontSize: '0.9rem', color: '#c33', marginTop: 4 }}>No brands available</p>
+            )}
           </label>
 
           <label>
             Your email
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required readOnly />
           </label>
 
           <label>
