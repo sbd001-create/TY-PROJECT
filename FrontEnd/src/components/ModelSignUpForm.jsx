@@ -395,7 +395,14 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
           }}
           {...(isEditMode ? {} : { required: true })}
         />
-        <p style={{ fontSize: '0.9rem', color: '#666', marginTop: 6 }}>upload at least 4 certificates.</p>
+        <p style={{ fontSize: '0.9rem', color: '#666', marginTop: 6 }}>
+          Upload at least 4 certificates. 
+          {(certFiles.length > 0 || certPreview.length > 0) && (
+            <span style={{ color: '#4caf50', fontWeight: 'bold' }}>
+              {' '}✓ {certFiles.length + certPreview.length} certificate(s) selected
+            </span>
+          )}
+        </p>
       </div>
 
       {/* Certificate previews (for both new uploads and existing ones) */}
