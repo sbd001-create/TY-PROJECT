@@ -390,8 +390,6 @@ const ModelSignUpForm = ({ onSwitch, onSignupSuccess, initialData = null, isEdit
             const files = Array.from(e.target.files || []);
             const newCerts = files.map(file => ({ file, preview: URL.createObjectURL(file) }));
             setCertFiles(prev => [...prev, ...newCerts]);
-            // clear the input so same file can be re-selected if needed
-            e.target.value = '';
           }}
           {...(isEditMode ? {} : { required: true })}
         />
