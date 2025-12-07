@@ -190,12 +190,26 @@ const UserList = () => {
 
             const slides = [];
             if (modelImages && modelImages.length > 0) slides.push(...modelImages);
-            if (certImage && !slides.includes(certImage)) slides.push(certImage);
+
+            // Collect certificate images into slides and non-image certificates into certLinks
+            const certLinks = [];
+            if (certs && certs.length > 0) {
+              for (const c of certs) {
+                if (!c || typeof c !== 'string') continue;
+                const isDataImage = c.startsWith('data:image');
+                const isFileImage = /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(c);
+                if (isDataImage || isFileImage) {
+                  if (!slides.includes(c)) slides.push(c);
+                } else {
+                  certLinks.push(c);
+                }
+              }
+            }
 
             const thumb = slides[0] || '/public/placeholder.png' || '';
 
             return (
-              <div key={user._id} className="model-card" onClick={() => setSelectedModel({ ...user, slides })} role="button" tabIndex={0} onKeyDown={(e)=>{ if(e.key==='Enter') setSelectedModel({ ...user, slides }) }}>
+              <div key={user._id} className="model-card" onClick={() => setSelectedModel({ ...user, slides, certLinks })} role="button" tabIndex={0} onKeyDown={(e)=>{ if(e.key==='Enter') setSelectedModel({ ...user, slides, certLinks }) }}>
                 <div className="model-thumb">
                   {thumb ? <img src={thumb} alt={`${user.username} thumbnail`} /> : <div style={{height:120,background:'#eee'}} />}
                 </div>
@@ -267,7 +281,7 @@ const UserList = () => {
               <div>
                 <ImageSlideshow images={selectedModel.slides || []} height={360} />
               </div>
-              <div>
+                <div>
                 {selectedModel.location && <p><strong>Location:</strong> {selectedModel.location}</p>}
                 {selectedModel.gender && <p><strong>Gender:</strong> {String(selectedModel.gender).replace(/_/g, ' ').replace(/(^|\s)\S/g, s => s.toUpperCase())}</p>}
                 {selectedModel.availability && <p><strong>Availability:</strong> {selectedModel.availability}</p>}
@@ -281,6 +295,20 @@ const UserList = () => {
                     <div className="skills-tags">
                       {selectedModel.skills.map(s => <span key={s} className="skill-tag">{s}</span>)}
                     </div>
+                  </div>
+                )}
+
+                {/* Show non-image certificates as links */}
+                {selectedModel.certLinks && selectedModel.certLinks.length > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    <strong>Other Certificates</strong>
+                    <ul style={{ marginTop: 6 }}>
+                      {selectedModel.certLinks.map((link, idx) => (
+                        <li key={`certlink-${idx}`} style={{ marginBottom: 6 }}>
+                          <a href={link} target="_blank" rel="noreferrer">Open Certificate {idx + 1}</a>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
 
